@@ -1,0 +1,28 @@
+version: '2'
+services:
+  elk:
+    image: sebp/elk:621
+    environment:
+      - LS_HEAP_SIZE=256m
+      - ES_HEAP_SIZE=266m 
+    ports:
+      - "5601:5601"
+      - "9200:9200"
+      - "5044:5044"
+    volumes:
+      - ./elk/03-tcp-input.conf:/etc/logstash/conf.d/03-tcp-input.conf
+      - ./elk/30-output.conf:/etc/logstash/conf.d/30-output.conf
+      - ./elk/logstash.conf:/etc/logstash/conf.d/logstash.conf
+      - elasticsearch_data:/var/lib/elasticsearch
+    networks: 
+      default:
+        aliases: 
+          - logstash
+  haproxy:
+    build: ./haproxy
+    volumes:
+      - ./haproxy/haproxy.cfg:/etc/haproxy/haproxy.cfg
+    ports:
+      - "80:80"
+volumes:
+  elasticsearch_data:
